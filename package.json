@@ -1,0 +1,23 @@
+{
+  "name": "event-management-system-backend",
+  "version": "1.0.0",
+  "description": "Event management system backend using Node and TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/app.js",
+    "dev": "nodemon src/app.ts",
+    "build": "tsc -p ."
+  },
+  "author": "Indrajith Bodhinayaka",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.13",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}
