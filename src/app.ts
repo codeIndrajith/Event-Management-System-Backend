@@ -1,9 +1,9 @@
 import express, { Application, NextFunction, Request, Response } from "express";
+import { connectDB } from "./config/db";
 
 const app: Application = express();
 
-app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  res.send("Hello");
-});
+// Database connection
+connectDB();
 
 app.listen(5000, () => console.log("Server running"));
