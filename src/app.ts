@@ -1,5 +1,5 @@
 import express, { Application, NextFunction, Request, Response } from "express";
-import { connectDB } from "./config/db";
+import { connectDB } from "./infrastructure/config/db";
 
 const app: Application = express();
 
