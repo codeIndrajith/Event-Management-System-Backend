@@ -1,13 +1,32 @@
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application } from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import { errorHandler } from "./middlewares/errorMiddlware";
+import cors from "cors";
 import { connectDB } from "./config/database";
+import authRoutes from "../src/routes/auth-routes/authRoutes";
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT ?? 5000;
 
 const app: Application = express();
 
 // Database connection
 connectDB();
+
+// Body Parser
+app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
+
+// Enable cors
+app.use(cors());
+
+// Auth Routes
+app.use("/api/v1/auth", authRoutes);
+
+// Handle errors
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
