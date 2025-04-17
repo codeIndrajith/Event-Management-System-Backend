@@ -1,17 +1,17 @@
+import { AuthResponse, SignInRequestBody } from "../../types/authTypes";
 import asyncHandler from "../../utils/asyncHandler";
 import { Request, Response, NextFunction } from "express";
-import { AuthResponse, SignUpRequestBody } from "../../types/authTypes";
 import {
   emailValidation,
   passwordValidation,
 } from "../../validations/authValidation";
-import { signupUser } from "../../services/authService";
+import { signinUser } from "../../services/authService";
 import { sendTokenResponse } from "../../services/sendTokenResponse";
 import { ErrorResponse } from "../../utils/errorResponse";
 
-export const userSignupController = asyncHandler(
+export const userSigninController = asyncHandler(
   async (
-    req: Request<{}, {}, SignUpRequestBody>,
+    req: Request<{}, {}, SignInRequestBody>,
     res: Response<AuthResponse>,
     next: NextFunction
   ) => {
@@ -19,17 +19,15 @@ export const userSignupController = asyncHandler(
     const validPassword = passwordValidation(req.body.password);
 
     if (validEmail && validPassword === "") {
-      const user = await signupUser(
+      const user = await signinUser(
         {
-          name: req.body.name,
           email: req.body.email,
           password: req.body.password,
-          role: req.body.role,
         },
         next
       );
 
-      sendTokenResponse(user, 201, res);
+      sendTokenResponse(user, 200, res);
     } else if (!validEmail) {
       next(new ErrorResponse("Email is not valid", 400));
     } else if (validPassword !== "") {

@@ -5,6 +5,11 @@ export interface SignUpRequestBody {
   role: string;
 }
 
+export interface SignInRequestBody {
+  email: string;
+  password: string;
+}
+
 export interface AuthResponse {
   success: boolean;
   statusCode: number;
@@ -12,11 +17,17 @@ export interface AuthResponse {
   message?: string;
 }
 
+export enum Role {
+  Admin = "Admin",
+  Organizer = "Organizer",
+  Participant = "Participant",
+}
+
 export interface SignupInput {
   name: string;
   email: string;
   password: string;
-  roleName: string;
+  role: string;
 }
 
 export interface CookieOptions {
