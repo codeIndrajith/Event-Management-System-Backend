@@ -5,6 +5,7 @@ import { errorHandler } from "./middlewares/errorMiddlware";
 import cors from "cors";
 import { connectDB } from "./config/database";
 import authRoutes from "../src/routes/auth-routes/authRoutes";
+import permissionLetterRotes from "../src/routes/Event-routes/eventRoutes";
 dotenv.config();
 
 const PORT = process.env.PORT ?? 5000;
@@ -25,6 +26,7 @@ app.use(cors());
 
 // Auth Routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/permission-letter", permissionLetterRotes);
 
 // Handle errors
 app.use(errorHandler);

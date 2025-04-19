@@ -1,3 +1,6 @@
+import { Request } from "express";
+import { UserPublicData } from "./public-types/user.types";
+
 export interface SignUpRequestBody {
   name: string;
   email: string;
@@ -35,4 +38,8 @@ export interface CookieOptions {
   httpOnly: boolean;
   secure?: boolean;
   sameSite?: "strict" | "lax" | "none";
+}
+
+export interface IRequest extends Request {
+  user?: UserPublicData;
 }
