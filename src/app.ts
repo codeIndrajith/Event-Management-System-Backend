@@ -26,7 +26,7 @@ app.use(cors());
 
 // Auth Routes
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/event", eventRoutes);
+app.use("/api/v1/events", eventRoutes);
 
 // Handle errors
 app.use(errorHandler);
