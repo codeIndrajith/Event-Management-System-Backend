@@ -1,5 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { SignInRequestBody, SignupInput } from "../types/authTypes";
+import {
+  IRequest,
+  SignInRequestBody,
+  SignUpRequestBody,
+} from "../types/authTypes";
 import bcrypt from "bcryptjs";
 import { UserPublicData } from "../types/public-types/user.types";
 import { NextFunction } from "express";
@@ -7,13 +11,13 @@ import { ErrorResponse } from "../utils/errorResponse";
 import { v4 as uuidv4 } from "uuid";
 import { toRole } from "../utils/role-converter";
 
-const prisma = new PrismaClient();
+const prisma: any = new PrismaClient();
 
 export const signupUser = async (
-  input: SignupInput,
+  input: SignUpRequestBody,
   next: NextFunction
 ): Promise<UserPublicData> => {
-  const { name, email, password, role } = input;
+  const { name, email, password, role, profileImage } = input;
 
   try {
     const existUser = await prisma.user.findUnique({ where: { email } });
@@ -35,6 +39,7 @@ export const signupUser = async (
         email,
         password: hashedPassword,
         role: roleName,
+        profileImage,
       },
     });
 
@@ -65,6 +70,25 @@ export const signinUser = async (
     return {
       ...publicData,
       id: String(publicData.id),
+    };
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const getUsersService = async (
+  req: IRequest,
+  next: NextFunction
+): Promise<UserPublicData> => {
+  try {
+    const user = await prisma.user.findFirst({ where: { id: req.user?.id } });
+    if (!user) {
+      throw new ErrorResponse("User not found", 400);
+    }
+    const { password: _, ...publicData } = user;
+    return {
+      ...publicData,
     };
   } catch (error: any) {
     next(error);

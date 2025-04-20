@@ -3,16 +3,16 @@ import { PermissionLetterRequestBody } from "../types/Event-types/EventTypes";
 import { PrismaClient } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 
-const prisma = new PrismaClient();
+const prisma: any = new PrismaClient();
 
-export const permissionLetterService = async (
+export const eventService = async (
   input: PermissionLetterRequestBody,
   userId: string,
   next: NextFunction
-): Promise<void> => {
+): Promise<boolean> => {
   try {
     const docId: any = uuidv4();
-    const permissionDoc = await prisma.permissionDoc.create({
+    const event = await prisma.event.create({
       data: {
         id: docId,
         senderId: userId,
@@ -26,7 +26,11 @@ export const permissionLetterService = async (
       },
     });
 
-    console.log(permissionDoc);
+    if (event) {
+      return true;
+    } else {
+      return false;
+    }
   } catch (error: any) {
     next(error);
     throw error;

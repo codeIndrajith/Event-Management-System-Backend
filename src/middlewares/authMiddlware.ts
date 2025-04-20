@@ -4,7 +4,7 @@ import { NextFunction, Response } from "express";
 import { IRequest } from "../types/authTypes";
 import { verifyToken } from "../utils/generateToken";
 
-const prisma = new PrismaClient();
+const prisma: any = new PrismaClient();
 
 // Protect Routes
 export const protect = async (
@@ -25,14 +25,14 @@ export const protect = async (
 
   //   Make sure token exists
   if (!token) {
-    throw new ErrorResponse("Not Authorized to access this routes", 401);
+    return next(new ErrorResponse("Not Authorized to access this route", 401));
   }
 
   const { id } = verifyToken(token);
   const user = await prisma.user.findUnique({ where: { id } });
 
   if (!user) {
-    throw new ErrorResponse("User not found", 404);
+    return next(new ErrorResponse("User not found", 404));
   }
 
   const { password, ...userWithoutPassword } = user;

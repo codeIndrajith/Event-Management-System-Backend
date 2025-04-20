@@ -6,6 +6,7 @@ export interface SignUpRequestBody {
   email: string;
   password: string;
   role: string;
+  profileImage: string;
 }
 
 export interface SignInRequestBody {
@@ -16,7 +17,7 @@ export interface SignInRequestBody {
 export interface AuthResponse {
   success: boolean;
   statusCode: number;
-  token: string;
+  token?: string;
   message?: string;
 }
 
@@ -24,13 +25,6 @@ export enum Role {
   Admin = "Admin",
   Organizer = "Organizer",
   Participant = "Participant",
-}
-
-export interface SignupInput {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
 }
 
 export interface CookieOptions {

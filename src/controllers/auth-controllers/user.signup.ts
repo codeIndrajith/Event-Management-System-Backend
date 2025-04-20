@@ -25,6 +25,7 @@ export const userSignupController = asyncHandler(
           email: req.body.email,
           password: req.body.password,
           role: req.body.role,
+          profileImage: req.body.profileImage,
         },
         next
       );

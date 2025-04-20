@@ -3,6 +3,8 @@ export interface UserPublicData {
   name: string;
   email: string;
   role: string;
+  profileImage: string;
+  password: string;
   createdAt: Date;
   updatedAt: Date;
 }

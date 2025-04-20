@@ -21,10 +21,11 @@ model User {
   updatedAt     DateTime        @updatedAt
   password      String
   role          Role
-  permissionDoc PermissionDoc[]
+  profileImage  String
+  event         Event[]
 }
 
-model PermissionDoc {
+model Event {
   id                 String   @id @default(uuid())
   senderId           String
   senderName         String
@@ -34,5 +35,14 @@ model PermissionDoc {
   eventTime          DateTime
   eventLocation      String
   letterLink         String
-  sender             User     @relation(fields: [senderId], references: [id])
+  isApproved          Boolean @default(false)
+  eventName            String?
+  eventDescription     String?
+  bannerImage           String?
+  note                  String?
+  eventType             String?
+  approvedLetterLink  String? 
+  approverName        String?
+  approverRole        String?
+  sender              User     @relation(fields: [senderId], references: [id])
 }
