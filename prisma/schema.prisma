@@ -36,6 +36,7 @@ model Event {
   eventLocation      String
   letterLink         String
   isApproved          Boolean @default(false)
+  isPublished         Boolean @default(false)
   eventName            String?
   eventDescription     String?
   bannerImage           String?

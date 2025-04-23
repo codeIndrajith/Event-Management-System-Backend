@@ -21,6 +21,7 @@ export interface EventResponse {
   senderOrganization?: string;
   letterLink?: string;
   isApproved?: boolean;
+  isPublished?: boolean;
   note?: string;
   eventType?: string;
   approvedLetterLink?: string;
