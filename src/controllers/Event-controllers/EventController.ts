@@ -8,6 +8,8 @@ import {
   getEventService,
   getOwnerEventService,
 } from "../../services/eventService";
+import { FilterOptions } from "../../types/Event-types/EventTypes";
+import { filterEventService } from "../../services/adminService";
 
 const EventController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
@@ -51,9 +53,34 @@ const getOwnerEventsController = asyncHandler(
   }
 );
 
+const FilterVenueController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const { venueName, locationType, maxAttendees } = req.query;
+    const filters: FilterOptions = {
+      venueName: typeof venueName === "string" ? venueName : undefined,
+      locationType:
+        typeof locationType === "string"
+          ? (locationType as "indoor" | "outdoor")
+          : undefined,
+      maxAttendees:
+        typeof maxAttendees === "string"
+          ? parseInt(maxAttendees, 10)
+          : undefined,
+    };
+    const venues = await filterEventService(filters, next);
+
+    res.status(200).json({
+      success: true,
+      statusCode: 200,
+      data: venues,
+    });
+  }
+);
+
 export {
   EventController,
   getAllEventController,
   getEventController,
   getOwnerEventsController,
+  FilterVenueController,
 };

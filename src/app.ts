@@ -6,6 +6,7 @@ import cors from "cors";
 import { connectDB } from "./config/database";
 import authRoutes from "../src/routes/auth-routes/authRoutes";
 import eventRoutes from "../src/routes/Event-routes/eventRoutes";
+import adminRoutes from "../src/routes/adim-routes/admin-routes";
 dotenv.config();
 
 const PORT = process.env.PORT ?? 5000;
@@ -27,6 +28,7 @@ app.use(cors());
 // Auth Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/events", eventRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 // Handle errors
 app.use(errorHandler);

@@ -8,6 +8,14 @@ export interface EventRequestBody {
   letterLink: string;
 }
 
+export interface EventApprovedRequestBody {
+  eventId: string;
+  approvedLetterLink?: string;
+  note?: string;
+  approverName: string;
+  approverRole: string;
+}
+
 export interface EventResponse {
   id: string;
   eventDate: Date;
@@ -25,4 +33,24 @@ export interface EventResponse {
   note?: string;
   eventType?: string;
   approvedLetterLink?: string;
+}
+
+// Admin
+export interface AddVenueRequestBody {
+  venueName: string;
+  locationType: "indoor" | "outdoor";
+  maxAttendees: number;
+}
+
+export interface FilterOptions {
+  venueName?: string;
+  locationType?: "indoor" | "outdoor";
+  maxAttendees?: number;
+}
+
+export interface FilteredVenueResponse {
+  id: string;
+  venueName: string;
+  locationType: "indoor" | "outdoor";
+  maxAttendees: number;
 }

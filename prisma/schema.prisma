@@ -23,6 +23,7 @@ model User {
   role          Role
   profileImage  String
   event         Event[]
+  venues        Venue[]
 }
 
 model Event {
@@ -46,4 +47,20 @@ model Event {
   approverName        String?
   approverRole        String?
   sender              User     @relation(fields: [senderId], references: [id])
+}
+
+model Venue {
+  id            String   @id @default(uuid())
+  adminId       String
+  venueName     String
+  locationType  LocationType
+  maxAttendees  Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  admin         User     @relation(fields: [adminId], references: [id])
+}
+
+enum LocationType {
+  indoor
+  outdoor
 }

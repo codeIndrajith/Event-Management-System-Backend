@@ -1,6 +1,7 @@
 import express from "express";
 import {
   EventController,
+  FilterVenueController,
   getAllEventController,
   getEventController,
   getOwnerEventsController,
@@ -10,6 +11,9 @@ const router = express.Router();
 
 router.route("/create").post(protect, authorize("Organizer"), EventController);
 router.route("/").get(getAllEventController);
+router
+  .route("/filter-venue")
+  .get(protect, authorize("Organizer"), FilterVenueController);
 router.route("/:eventId").get(getEventController);
 router
   .route("/owner")
