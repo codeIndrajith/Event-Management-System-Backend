@@ -1,4 +1,7 @@
-import { addVenuService } from "../../services/adminService";
+import {
+  addVenuService,
+  approveEventService,
+} from "../../services/adminService";
 import { IRequest } from "../../types/authTypes";
 import { ResponseFormat } from "../../types/public-types/resFormat.type";
 import asyncHandler from "../../utils/asyncHandler";
@@ -20,4 +23,14 @@ const VenuController = asyncHandler(
   }
 );
 
-export { VenuController };
+const ApprovedEventController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const approvedEventMsg = await approveEventService(next, req.body);
+
+    res
+      .status(200)
+      .json({ success: true, statusCode: 200, message: approvedEventMsg });
+  }
+);
+
+export { VenuController, ApprovedEventController };

@@ -4,8 +4,25 @@ export interface EventRequestBody {
   senderOrganization: string;
   eventDate: Date;
   eventTime: string;
-  eventLocation: string;
+  venuId: string;
+  venue: string;
   letterLink: string;
+}
+
+export interface ApproveEventRequestBody {
+  eventId: string;
+  approvedLetterLink: string;
+  approverName: string;
+  approverRole: string;
+}
+
+export interface PublishEventRequestBody {
+  eventId: string;
+  eventName: string;
+  eventDescription: string;
+  bannerImage: string;
+  note: string;
+  eventType: string;
 }
 
 export interface EventApprovedRequestBody {
@@ -46,6 +63,7 @@ export interface FilterOptions {
   venueName?: string;
   locationType?: "indoor" | "outdoor";
   maxAttendees?: number;
+  date: string;
 }
 
 export interface FilteredVenueResponse {

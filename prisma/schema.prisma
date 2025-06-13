@@ -32,8 +32,8 @@ model Event {
   senderName         String
   senderRole         String
   senderOrganization String
-  eventDate          DateTime
-  eventTime          DateTime
+  eventDate          String
+  eventTime          String
   eventLocation      String
   letterLink         String
   isApproved          Boolean @default(false)
@@ -58,9 +58,18 @@ model Venue {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   admin         User     @relation(fields: [adminId], references: [id])
+  venueDates    VenueDates[]
 }
 
 enum LocationType {
   indoor
   outdoor
+}
+
+model VenueDates {
+  id            String @id @default(uuid())
+  venuId        String
+  date          String
+  isSelected    Boolean @default(false)
+  venue         Venue @relation(fields: [venuId], references: [id])
 }

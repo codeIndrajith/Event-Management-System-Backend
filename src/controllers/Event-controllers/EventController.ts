@@ -7,9 +7,11 @@ import {
   getAllEventService,
   getEventService,
   getOwnerEventService,
+  publishedEventService,
 } from "../../services/eventService";
 import { FilterOptions } from "../../types/Event-types/EventTypes";
 import { filterEventService } from "../../services/adminService";
+import { ErrorResponse } from "../../utils/errorResponse";
 
 const EventController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
@@ -53,8 +55,36 @@ const getOwnerEventsController = asyncHandler(
   }
 );
 
+const publishedEventController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const userId: string = `${req.user?.id}`;
+
+    const publishedEventMsg = await publishedEventService(
+      next,
+      req.body,
+      userId
+    );
+
+    res
+      .status(200)
+      .json({ success: true, statusCode: 200, message: publishedEventMsg });
+  }
+);
+
 const FilterVenueController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    if (req.query.date === undefined) {
+      throw new ErrorResponse("Date is required", 400);
+    }
+    const rawDate = req.query.date;
+    if (typeof rawDate !== "string") {
+      throw new ErrorResponse("Invalid date: must be a string", 400);
+    }
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (!dateRegex.test(rawDate)) {
+      throw new ErrorResponse("Invalid date format: expected yyyy-mm-dd", 400);
+    }
     const { venueName, locationType, maxAttendees } = req.query;
     const filters: FilterOptions = {
       venueName: typeof venueName === "string" ? venueName : undefined,
@@ -66,6 +96,7 @@ const FilterVenueController = asyncHandler(
         typeof maxAttendees === "string"
           ? parseInt(maxAttendees, 10)
           : undefined,
+      date: rawDate,
     };
     const venues = await filterEventService(filters, next);
 
@@ -79,6 +110,7 @@ const FilterVenueController = asyncHandler(
 
 export {
   EventController,
+  publishedEventController,
   getAllEventController,
   getEventController,
   getOwnerEventsController,

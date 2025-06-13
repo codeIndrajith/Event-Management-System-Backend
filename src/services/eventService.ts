@@ -2,6 +2,7 @@ import { Request, NextFunction } from "express";
 import {
   EventRequestBody,
   EventResponse,
+  PublishEventRequestBody,
 } from "../types/Event-types/EventTypes";
 import { PrismaClient } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
@@ -23,14 +24,21 @@ export const eventService = async (
         senderName: input.senderNamer,
         senderRole: input.senderRole,
         senderOrganization: input.senderOrganization,
-        eventDate: new Date(input.eventDate),
-        eventTime: new Date(input.eventTime),
-        eventLocation: input.eventLocation,
+        eventDate: input.eventDate,
+        eventTime: input.eventTime,
+        eventLocation: input.venue,
         letterLink: input.letterLink,
       },
     });
 
     if (event) {
+      await prisma.venueDates.create({
+        data: {
+          date: input?.eventDate,
+          venuId: input?.venuId,
+          isSelected: false,
+        },
+      });
       return true;
     } else {
       return false;
@@ -48,6 +56,7 @@ export const getAllEventService = async (
     const events: EventResponse[] = await prisma.event.findMany({
       where: {
         isPublished: true,
+        isApproved: true,
       },
       select: {
         id: true,
@@ -64,6 +73,7 @@ export const getAllEventService = async (
         note: true,
         eventType: true,
         isApproved: true,
+        isPublished: true,
       },
     });
 
@@ -140,6 +150,37 @@ export const getOwnerEventService = async (
     });
 
     return events;
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const publishedEventService = async (
+  next: NextFunction,
+  data: PublishEventRequestBody,
+  userId: string
+): Promise<string> => {
+  try {
+    const publishEvent = await prisma.event.update({
+      where: {
+        id: data?.eventId,
+      },
+      data: {
+        eventName: data?.eventName,
+        eventDescription: data?.eventDescription,
+        bannerImage: data?.bannerImage,
+        note: data?.note,
+        eventType: data?.eventType,
+        isPublished: true,
+      },
+    });
+
+    if (publishEvent) {
+      return "Event Publish Complete";
+    } else {
+      return "Event Publish Failed";
+    }
   } catch (error: any) {
     next(error);
     throw error;
