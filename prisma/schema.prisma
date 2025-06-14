@@ -24,6 +24,7 @@ model User {
   profileImage  String
   event         Event[]
   venues        Venue[]
+  joinMembers   JoinMembers[]
 }
 
 model Event {
@@ -42,11 +43,14 @@ model Event {
   eventDescription     String?
   bannerImage           String?
   note                  String?
+  reason                String?
   eventType             String?
   approvedLetterLink  String? 
   approverName        String?
   approverRole        String?
   sender              User     @relation(fields: [senderId], references: [id])
+  venueDates        VenueDates[]
+  joinMembers       JoinMembers[]
 }
 
 model Venue {
@@ -69,7 +73,20 @@ enum LocationType {
 model VenueDates {
   id            String @id @default(uuid())
   venuId        String
+  eventId       String
   date          String
   isSelected    Boolean @default(false)
   venue         Venue @relation(fields: [venuId], references: [id])
+  event         Event @relation(fields: [eventId], references: [id])
+}
+
+model JoinMembers {
+  id                String @id @default(uuid())
+  eventId           String
+  participantId     String
+  participantName   String
+  participantEmail  String
+  contactNumber     String
+  event             Event @relation(fields: [eventId], references: [id])
+  participant       User @relation(fields: [participantId], references: [id])
 }

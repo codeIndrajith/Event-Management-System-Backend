@@ -5,9 +5,10 @@ import { IRequest } from "../../types/authTypes";
 import {
   eventService,
   getAllEventService,
-  getEventService,
-  getOwnerEventService,
+  getPublishedEventService,
+  getOwnerAllEventService,
   publishedEventService,
+  getOwnerEventService,
 } from "../../services/eventService";
 import { FilterOptions } from "../../types/Event-types/EventTypes";
 import { filterEventService } from "../../services/adminService";
@@ -29,7 +30,7 @@ const EventController = asyncHandler(
   }
 );
 
-const getAllEventController = asyncHandler(
+const getAllPublishedEventController = asyncHandler(
   async (req: Request, res: Response<ResponseFormat>, next: NextFunction) => {
     const allEvents = await getAllEventService(next);
 
@@ -37,19 +38,30 @@ const getAllEventController = asyncHandler(
   }
 );
 
-const getEventController = asyncHandler(
+const getPublishedEventController = asyncHandler(
   async (req: Request, res: Response<ResponseFormat>, next: NextFunction) => {
     const eventId: string = `${req.params.eventId}`;
-    const event = await getEventService(next, eventId);
+    const event = await getPublishedEventService(next, eventId);
     res.status(200).json({ success: true, statusCode: 200, data: event });
   }
 );
 
-const getOwnerEventsController = asyncHandler(
+const getOwnerAllEventsController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
     const userId: string = `${req.user?.id}`;
 
-    const ownerEvent = await getOwnerEventService(next, userId);
+    const ownerEvents = await getOwnerAllEventService(next, userId);
+
+    res.status(200).json({ success: true, statusCode: 200, data: ownerEvents });
+  }
+);
+
+const getOwnerEventController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const userId: string = `${req.user?.id}`;
+    const eventId: string = req.params?.eventId;
+
+    const ownerEvent = await getOwnerEventService(next, userId, eventId);
 
     res.status(200).json({ success: true, statusCode: 200, data: ownerEvent });
   }
@@ -111,8 +123,9 @@ const FilterVenueController = asyncHandler(
 export {
   EventController,
   publishedEventController,
-  getAllEventController,
-  getEventController,
-  getOwnerEventsController,
+  getAllPublishedEventController,
+  getPublishedEventController,
+  getOwnerAllEventsController,
+  getOwnerEventController,
   FilterVenueController,
 };

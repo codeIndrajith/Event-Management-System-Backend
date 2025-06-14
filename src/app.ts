@@ -7,6 +7,7 @@ import { connectDB } from "./config/database";
 import authRoutes from "../src/routes/auth-routes/authRoutes";
 import eventRoutes from "../src/routes/Event-routes/eventRoutes";
 import adminRoutes from "../src/routes/adim-routes/admin-routes";
+import joinEventRoutes from "../src/routes/Event-routes/eventJoinRoutes";
 dotenv.config();
 
 const PORT = process.env.PORT ?? 5000;
@@ -29,6 +30,7 @@ app.use(cors());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/join", joinEventRoutes);
 
 // Handle errors
 app.use(errorHandler);

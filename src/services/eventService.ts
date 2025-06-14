@@ -36,7 +36,8 @@ export const eventService = async (
         data: {
           date: input?.eventDate,
           venuId: input?.venuId,
-          isSelected: false,
+          eventId: event?.id,
+          isSelected: true,
         },
       });
       return true;
@@ -84,7 +85,7 @@ export const getAllEventService = async (
   }
 };
 
-export const getEventService = async (
+export const getPublishedEventService = async (
   next: NextFunction,
   eventId: string
 ): Promise<EventResponse> => {
@@ -109,6 +110,8 @@ export const getEventService = async (
         eventType: true,
         isApproved: true,
         isPublished: true,
+        letterLink: true,
+        approvedLetterLink: true,
       },
     });
 
@@ -127,12 +130,12 @@ export const getEventService = async (
   }
 };
 
-export const getOwnerEventService = async (
+export const getOwnerAllEventService = async (
   next: NextFunction,
   userId: string
 ): Promise<EventResponse[] | []> => {
   try {
-    const events: EventResponse[] = await prisma.event.findMany({
+    const rawEvents: EventResponse[] = await prisma.event.findMany({
       where: {
         senderId: userId,
       },
@@ -142,14 +145,65 @@ export const getOwnerEventService = async (
         senderName: true,
         senderRole: true,
         senderOrganization: true,
+        eventName: true,
         eventDate: true,
         eventTime: true,
         eventLocation: true,
         isApproved: true,
+        isPublished: true,
+        letterLink: true,
+        approvedLetterLink: true,
       },
     });
 
+    const events = rawEvents.map(({ approvedLetterLink, ...rest }) =>
+      approvedLetterLink == null ? rest : { ...rest, approvedLetterLink }
+    );
+
     return events;
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const getOwnerEventService = async (
+  next: NextFunction,
+  userId: string,
+  eventId: string
+): Promise<EventResponse[] | []> => {
+  try {
+    const event = await prisma.event.findFirst({
+      where: {
+        senderId: userId,
+        id: eventId,
+      },
+      select: {
+        id: true,
+        senderId: true,
+        senderName: true,
+        senderRole: true,
+        senderOrganization: true,
+        eventName: true,
+        eventDate: true,
+        eventTime: true,
+        eventLocation: true,
+        isApproved: true,
+        isPublished: true,
+        letterLink: true,
+        approvedLetterLink: true,
+      },
+    });
+
+    if (!event) {
+      throw new ErrorResponse("Event Not Found", 404);
+    }
+
+    if (event && event.approvedLetterLink === null) {
+      delete event.approvedLetterLink;
+    }
+
+    return event;
   } catch (error: any) {
     next(error);
     throw error;

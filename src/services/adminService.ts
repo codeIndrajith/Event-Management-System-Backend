@@ -46,21 +46,32 @@ export const approveEventService = async (
   data: ApproveEventRequestBody
 ): Promise<string> => {
   try {
-    const isApproved = await prisma.event.update({
+    const eventApproved = await prisma.event.update({
       where: {
         id: data?.eventId,
-        isApproved: true,
       },
       data: {
-        approvedLetterLink: data?.approvedLetterLink,
+        approvedLetterLink: data?.isApproved ? data?.approvedLetterLink : null,
         approverName: data?.approverName,
         approverRole: data?.approverRole,
-        isApproved: true,
+        isApproved: data?.isApproved,
+        reason: data?.isApproved === false ? data?.reason : null,
       },
     });
 
-    if (isApproved) {
-      return "Event Approve Complete";
+    if (data?.isApproved === false) {
+      await prisma.venueDates.updateMany({
+        where: {
+          eventId: data?.eventId,
+        },
+        data: {
+          isSelected: false,
+        },
+      });
+    }
+
+    if (eventApproved) {
+      return "Event Active Change Complete";
     } else {
       return "Event Approve Failed";
     }

@@ -11,9 +11,11 @@ export interface EventRequestBody {
 
 export interface ApproveEventRequestBody {
   eventId: string;
-  approvedLetterLink: string;
+  approvedLetterLink?: string;
   approverName: string;
   approverRole: string;
+  isApproved: boolean;
+  reason?: string;
 }
 
 export interface PublishEventRequestBody {
