@@ -1,6 +1,9 @@
 import {
   addVenuService,
   approveEventService,
+  getAllVenuService,
+  pendingApproveEventService,
+  updateVenuService,
 } from "../../services/adminService";
 import { IRequest } from "../../types/authTypes";
 import { ResponseFormat } from "../../types/public-types/resFormat.type";
@@ -23,6 +26,43 @@ const VenuController = asyncHandler(
   }
 );
 
+const GetAllVenuController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const pageNumber = parseInt(req.query.pageNumber as string) || 1;
+    const pageSize = parseInt(req.query.pageSize as string) || 1000;
+    const venueId = req.query.venueId as string;
+
+    const venues = await getAllVenuService(pageNumber, pageSize, next, venueId);
+    res.status(200).json({
+      success: true,
+      statusCode: 200,
+      data: venues,
+    });
+  }
+);
+
+const UpdateVenuController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const venueId = req.params.venueId;
+    const updateVenueMsg = await updateVenuService(req.body, venueId, next);
+    res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: updateVenueMsg,
+    });
+  }
+);
+
+const GetAllPendingApprovedEventController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const pendingApprovalEvents = await pendingApproveEventService(next);
+
+    res
+      .status(200)
+      .json({ success: true, statusCode: 200, data: pendingApprovalEvents });
+  }
+);
+
 const ApprovedEventController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
     const approvedEventMsg = await approveEventService(next, req.body);
@@ -33,4 +73,10 @@ const ApprovedEventController = asyncHandler(
   }
 );
 
-export { VenuController, ApprovedEventController };
+export {
+  VenuController,
+  ApprovedEventController,
+  GetAllVenuController,
+  GetAllPendingApprovedEventController,
+  UpdateVenuController,
+};

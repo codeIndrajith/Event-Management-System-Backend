@@ -56,9 +56,9 @@ export interface EventResponse {
 
 // Admin
 export interface AddVenueRequestBody {
-  venueName: string;
-  locationType: "indoor" | "outdoor";
-  maxAttendees: number;
+  venueName?: string;
+  locationType?: "indoor" | "outdoor";
+  maxAttendees?: number;
 }
 
 export interface FilterOptions {
@@ -66,6 +66,12 @@ export interface FilterOptions {
   locationType?: "indoor" | "outdoor";
   maxAttendees?: number;
   date: string;
+}
+
+export interface VenueResponse {
+  venueName?: string;
+  locationType?: string;
+  maxAttendees?: number;
 }
 
 export interface FilteredVenueResponse {

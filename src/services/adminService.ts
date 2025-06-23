@@ -4,8 +4,10 @@ import { PrismaClient } from "@prisma/client";
 import {
   AddVenueRequestBody,
   ApproveEventRequestBody,
+  EventResponse,
   FilteredVenueResponse,
   FilterOptions,
+  VenueResponse,
 } from "../types/Event-types/EventTypes";
 import { ErrorResponse } from "../utils/errorResponse";
 
@@ -34,6 +36,65 @@ export const addVenuService = async (
       return true;
     } else {
       return false;
+    }
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const getAllVenuService = async (
+  pageNumber: number,
+  pageSize: number,
+  next: NextFunction,
+  venueId?: string
+): Promise<VenueResponse[]> => {
+  try {
+    const skip = (pageNumber - 1) * pageSize;
+    const getAllEvent = await prisma.venue.findMany({
+      skip,
+      take: pageSize,
+      where: venueId
+        ? {
+            id: venueId,
+          }
+        : undefined,
+      select: {
+        id: true,
+        venueName: true,
+        locationType: true,
+        maxAttendees: true,
+      },
+    });
+
+    return getAllEvent;
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const updateVenuService = async (
+  data: AddVenueRequestBody,
+  venueId: string,
+  next: NextFunction
+): Promise<string> => {
+  try {
+    const updateEvent = await prisma.venue.update({
+      where: {
+        id: venueId,
+      },
+      data: {
+        venueName: data?.venueName,
+        locationType: data?.locationType,
+        maxAttendees: data?.maxAttendees,
+      },
+    });
+
+    if (updateEvent) {
+      return "Event update complete";
+    } else {
+      return "Event update failed";
     }
   } catch (error: any) {
     next(error);
@@ -75,6 +136,35 @@ export const approveEventService = async (
     } else {
       return "Event Approve Failed";
     }
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const pendingApproveEventService = async (
+  next: NextFunction
+): Promise<EventResponse[]> => {
+  try {
+    const pendingApproveEvents = await prisma.event.findMany({
+      where: {
+        isPublished: false,
+        isApproved: false,
+      },
+      select: {
+        id: true,
+        eventDate: true,
+        eventTime: true,
+        eventLocation: true,
+        senderName: true,
+        senderRole: true,
+        senderOrganization: true,
+        letterLink: true,
+        isApproved: true,
+      },
+    });
+
+    return pendingApproveEvents;
   } catch (error: any) {
     next(error);
     throw error;
