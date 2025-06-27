@@ -23,6 +23,7 @@ export const userSigninController = asyncHandler(
         {
           email: req.body.email,
           password: req.body.password,
+          role: req.body.role,
         },
         next
       );

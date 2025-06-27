@@ -12,6 +12,7 @@ export interface SignUpRequestBody {
 export interface SignInRequestBody {
   email: string;
   password: string;
+  role: string;
 }
 
 export interface AuthResponse {

@@ -55,12 +55,17 @@ export const signinUser = async (
   input: SignInRequestBody,
   next: NextFunction
 ): Promise<UserPublicData> => {
-  const { email, password } = input;
+  const { email, password, role } = input;
 
   try {
-    const logUser = await prisma.user.findFirst({ where: { email } });
+    if (!role) {
+      throw new ErrorResponse("Role is required", 400);
+    }
+    const logUser = await prisma.user.findFirst({
+      where: { email, role },
+    });
     if (!logUser) {
-      throw new ErrorResponse("Invalid email or password", 401);
+      throw new ErrorResponse("Invalid credentials", 401);
     }
     const isPasswordValid = await bcrypt.compare(password, logUser.password);
     if (!isPasswordValid) {
