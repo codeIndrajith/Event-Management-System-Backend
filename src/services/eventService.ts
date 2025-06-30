@@ -24,6 +24,7 @@ export const eventService = async (
         senderName: input.senderNamer,
         senderRole: input.senderRole,
         senderOrganization: input.senderOrganization,
+        eventName: input.eventName,
         eventDate: input.eventDate,
         eventTime: input.eventTime,
         eventLocation: input.venue,
@@ -216,12 +217,19 @@ export const publishedEventService = async (
   userId: string
 ): Promise<string> => {
   try {
+    const event = await prisma.event.findUnique({
+      where: { id: data?.eventId },
+      select: { isApproved: true },
+    });
+    if (!event.isApproved) {
+      throw new ErrorResponse("Event is not approved yet", 400);
+    }
     const publishEvent = await prisma.event.update({
       where: {
         id: data?.eventId,
       },
       data: {
-        eventName: data?.eventName,
+        // eventName: data?.eventName,
         eventDescription: data?.eventDescription,
         bannerImage: data?.bannerImage,
         note: data?.note,

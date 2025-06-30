@@ -210,3 +210,14 @@ export const filterEventService = async (
     throw error;
   }
 };
+
+// export const adminDashboardDataService = async (
+//   next: NextFunction
+// ): Promise<AdminDashboardDataServiceResponse[]> => {
+//   try {
+
+//   } catch (error: any) {
+//     next(error);
+//     throw error;
+//   }
+// };

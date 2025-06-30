@@ -2,6 +2,7 @@ export interface EventRequestBody {
   senderNamer: string;
   senderRole: string;
   senderOrganization: string;
+  eventName: string;
   eventDate: Date;
   eventTime: string;
   venuId: string;
@@ -20,7 +21,7 @@ export interface ApproveEventRequestBody {
 
 export interface PublishEventRequestBody {
   eventId: string;
-  eventName: string;
+  // eventName: string;
   eventDescription: string;
   bannerImage: string;
   note: string;
@@ -79,4 +80,11 @@ export interface FilteredVenueResponse {
   venueName: string;
   locationType: "indoor" | "outdoor";
   maxAttendees: number;
+}
+
+export interface AdminDashboardDataServiceResponse {
+  totalEvent: number;
+  pendingApprovals: number;
+  activeVenues: number;
+  recentEvents: Event;
 }
