@@ -20,14 +20,14 @@ const EventController = asyncHandler(
 
     const response = await eventService(req.body, userId, next);
 
-    console.log(response);
-
     if (response?.success) {
       res.status(201).json({
         success: response?.success,
         statusCode: 201,
         message: "Event created",
-        data: response?.eventId,
+        data: {
+          eventId: response?.eventId,
+        },
       });
     }
   }
