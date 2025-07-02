@@ -84,7 +84,7 @@ export interface FilteredVenueResponse {
 
 export interface AdminDashboardDataServiceResponse {
   totalEvent: number;
-  pendingApprovals: number;
+  pendingEvents?: number;
   activeVenues: number;
-  recentEvents: Event;
+  recentEvents?: Event;
 }

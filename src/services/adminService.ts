@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PrismaClient } from "@prisma/client";
 import {
   AddVenueRequestBody,
+  AdminDashboardDataServiceResponse,
   ApproveEventRequestBody,
   EventResponse,
   FilteredVenueResponse,
@@ -149,7 +150,6 @@ export const pendingApproveEventService = async (
     const pendingApproveEvents = await prisma.event.findMany({
       where: {
         isPublished: false,
-        isApproved: false,
       },
       select: {
         id: true,
@@ -211,13 +211,23 @@ export const filterEventService = async (
   }
 };
 
-// export const adminDashboardDataService = async (
-//   next: NextFunction
-// ): Promise<AdminDashboardDataServiceResponse[]> => {
-//   try {
+export const adminDashboardDataService = async (
+  next: NextFunction
+): Promise<AdminDashboardDataServiceResponse> => {
+  try {
+    const [totalEvent, activeVenues, pendingEvents] = await Promise.all([
+      prisma.event.count(),
+      prisma.venue.count(),
+      prisma.event.count({ where: { isApproved: false } }),
+    ]);
 
-//   } catch (error: any) {
-//     next(error);
-//     throw error;
-//   }
-// };
+    return {
+      totalEvent,
+      activeVenues,
+      pendingEvents,
+    };
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};

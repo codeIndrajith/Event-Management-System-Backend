@@ -1,5 +1,6 @@
 import {
   addVenuService,
+  adminDashboardDataService,
   approveEventService,
   getAllVenuService,
   pendingApproveEventService,
@@ -73,15 +74,15 @@ const ApprovedEventController = asyncHandler(
   }
 );
 
-// const AdminDashboardPageDataController = asyncHandler(
-//   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
-//     const dashboardData = await adminDashboardDataService(next);
+const AdminDashboardPageDataController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const dashboardData = await adminDashboardDataService(next);
 
-//     res
-//       .status(200)
-//       .json({ success: true, statusCode: 200, data: dashboardData });
-//   }
-// );
+    res
+      .status(200)
+      .json({ success: true, statusCode: 200, data: dashboardData });
+  }
+);
 
 export {
   VenuController,
@@ -89,5 +90,5 @@ export {
   GetAllVenuController,
   GetAllPendingApprovedEventController,
   UpdateVenuController,
-  // AdminDashboardPageDataController
+  AdminDashboardPageDataController,
 };

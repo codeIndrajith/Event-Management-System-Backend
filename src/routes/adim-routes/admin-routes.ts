@@ -1,6 +1,7 @@
 import express from "express";
 import { authorize, protect } from "../../middlewares/authMiddlware";
 import {
+  AdminDashboardPageDataController,
   ApprovedEventController,
   GetAllPendingApprovedEventController,
   GetAllVenuController,
@@ -20,5 +21,8 @@ router
 router
   .route("/pending-approval-event")
   .get(protect, authorize("Admin"), GetAllPendingApprovedEventController);
+router
+  .route("/dashboard-data")
+  .get(protect, authorize("Admin"), AdminDashboardPageDataController);
 
 export default router;
