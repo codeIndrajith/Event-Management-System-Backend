@@ -18,13 +18,16 @@ const EventController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
     const userId: string = `${req.user?.id}`;
 
-    const isAddNotApprivedEvent = await eventService(req.body, userId, next);
+    const response = await eventService(req.body, userId, next);
 
-    if (isAddNotApprivedEvent) {
+    console.log(response);
+
+    if (response?.success) {
       res.status(201).json({
-        success: isAddNotApprivedEvent,
+        success: response?.success,
         statusCode: 201,
         message: "Event created",
+        data: response?.eventId,
       });
     }
   }

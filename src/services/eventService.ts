@@ -14,7 +14,7 @@ export const eventService = async (
   input: EventRequestBody,
   userId: string,
   next: NextFunction
-): Promise<boolean> => {
+): Promise<any> => {
   try {
     const docId: any = uuidv4();
     const event = await prisma.event.create({
@@ -41,9 +41,14 @@ export const eventService = async (
           isSelected: true,
         },
       });
-      return true;
+      return {
+        success: true,
+        eventId: event?.id,
+      };
     } else {
-      return false;
+      return {
+        success: false,
+      };
     }
   } catch (error: any) {
     next(error);
