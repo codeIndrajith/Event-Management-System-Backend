@@ -56,7 +56,8 @@ const UpdateVenuController = asyncHandler(
 
 const GetAllPendingApprovedEventController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
-    const pendingApprovalEvents = await pendingApproveEventService(next);
+    const limit = parseInt(req.query.limit as string) || 1000;
+    const pendingApprovalEvents = await pendingApproveEventService(next, limit);
 
     res
       .status(200)

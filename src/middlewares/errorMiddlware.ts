@@ -22,6 +22,12 @@ export const errorHandler = (
   // Handle prisma errors
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     switch (err.code) {
+      case "P1001":
+        error = new ErrorResponse(
+          "Cannot reach the database server. Please ensure it is running and accessible.",
+          503
+        );
+        break;
       case "P2002":
         const targetFields = err.meta?.target?.join(", ") || "fields";
         error = new ErrorResponse(`Duplicate entry for ${targetFields}`, 409);

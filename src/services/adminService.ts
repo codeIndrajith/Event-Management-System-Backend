@@ -144,18 +144,24 @@ export const approveEventService = async (
 };
 
 export const pendingApproveEventService = async (
-  next: NextFunction
+  next: NextFunction,
+  limit?: number
 ): Promise<EventResponse[]> => {
   try {
     const pendingApproveEvents = await prisma.event.findMany({
       where: {
         isPublished: false,
       },
+      orderBy: {
+        eventDate: "asc",
+      },
+      take: limit,
       select: {
         id: true,
         eventDate: true,
         eventTime: true,
         eventLocation: true,
+        eventName: true,
         senderName: true,
         senderRole: true,
         senderOrganization: true,
