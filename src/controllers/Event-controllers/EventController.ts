@@ -10,6 +10,7 @@ import {
   publishedEventService,
   getOwnerEventService,
   getPublishedEventDatesService,
+  addFavoriteEventService,
 } from "../../services/eventService";
 import { FilterOptions } from "../../types/Event-types/EventTypes";
 import { filterEventService } from "../../services/adminService";
@@ -97,6 +98,22 @@ const publishedEventController = asyncHandler(
   }
 );
 
+const addFavoriteEventController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const userId: string = req.user?.id as string;
+
+    const eventAddToFavoriteMsg = await addFavoriteEventService(
+      next,
+      req.body,
+      userId
+    );
+
+    res
+      .status(201)
+      .json({ success: true, statusCode: 201, message: eventAddToFavoriteMsg });
+  }
+);
+
 const FilterVenueController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
     if (req.query.date === undefined) {
@@ -142,5 +159,6 @@ export {
   getPublishedEventController,
   getOwnerAllEventsController,
   getOwnerEventController,
+  addFavoriteEventController,
   FilterVenueController,
 };

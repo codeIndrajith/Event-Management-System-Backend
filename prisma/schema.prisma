@@ -25,6 +25,7 @@ model User {
   event         Event[]
   venues        Venue[]
   joinMembers   JoinMembers[]
+  FavoriteEvents    FavoriteEvents[]
 }
 
 model Event {
@@ -51,6 +52,7 @@ model Event {
   sender              User     @relation(fields: [senderId], references: [id])
   venueDates        VenueDates[]
   joinMembers       JoinMembers[]
+  FavoriteEvents    FavoriteEvents[]
 }
 
 model Venue {
@@ -89,4 +91,12 @@ model JoinMembers {
   contactNumber     String
   event             Event @relation(fields: [eventId], references: [id])
   participant       User @relation(fields: [participantId], references: [id])
+}
+
+model FavoriteEvents {
+  id                String @id @default(uuid())
+  eventId           String
+  userId            String
+  event             Event @relation(fields: [eventId], references: [id])
+  user              User @relation(fields: [userId], references: [id])
 }

@@ -1,5 +1,6 @@
 import { Request, NextFunction } from "express";
 import {
+  AddFavoriteEventRequestBody,
   EventRequestBody,
   EventResponse,
   PublishedEventDatesResponse,
@@ -8,6 +9,7 @@ import {
 import { PrismaClient } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { ErrorResponse } from "../utils/errorResponse";
+import { sanitizeResponse } from "../utils/sanitizedResponse";
 
 const prisma: any = new PrismaClient();
 
@@ -78,6 +80,7 @@ export const getAllEventService = async (
         eventName: true,
         eventDescription: true,
         bannerImage: true,
+        approvedLetterLink: true,
         reason: true,
         note: true,
         eventType: true,
@@ -86,7 +89,7 @@ export const getAllEventService = async (
       },
     });
 
-    return events;
+    return sanitizeResponse<EventResponse[]>(events);
   } catch (error: any) {
     next(error);
     throw error;
@@ -131,7 +134,7 @@ export const getPublishedEventService = async (
       throw new ErrorResponse("Event not published", 403);
     }
 
-    return event;
+    return sanitizeResponse<EventResponse>(event);
   } catch (error: any) {
     next(error);
     throw error;
@@ -192,11 +195,7 @@ export const getOwnerAllEventService = async (
       },
     });
 
-    const events = rawEvents.map(({ approvedLetterLink, ...rest }) =>
-      approvedLetterLink == null ? rest : { ...rest, approvedLetterLink }
-    );
-
-    return events;
+    return sanitizeResponse<EventResponse[]>(rawEvents);
   } catch (error: any) {
     next(error);
     throw error;
@@ -240,7 +239,7 @@ export const getOwnerEventService = async (
       delete event.approvedLetterLink;
     }
 
-    return event;
+    return sanitizeResponse(event);
   } catch (error: any) {
     next(error);
     throw error;
@@ -278,6 +277,29 @@ export const publishedEventService = async (
       return "Event Publish Complete";
     } else {
       return "Event Publish Failed";
+    }
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const addFavoriteEventService = async (
+  next: NextFunction,
+  data: AddFavoriteEventRequestBody,
+  userId: string
+): Promise<string> => {
+  try {
+    const eventAddFavorite = await prisma.favoriteEvents.create({
+      data: {
+        eventId: data.eventId,
+        userId: userId,
+      },
+    });
+    if (eventAddFavorite) {
+      return "Event Publish Complete";
+    } else {
+      throw new ErrorResponse("Failed to add event to favorites", 400);
     }
   } catch (error: any) {
     next(error);

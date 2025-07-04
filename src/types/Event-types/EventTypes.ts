@@ -42,23 +42,28 @@ export interface EventResponse {
   eventTime: string;
   eventLocation: string;
   eventName: string;
-  eventDescription: string;
-  bannerImage: string;
+  eventDescription: string | null;
+  bannerImage: string | null;
   senderNamer?: string;
   senderRole?: string;
   senderOrganization?: string;
-  letterLink?: string;
+  letterLink?: string | null;
   isApproved?: boolean;
   isPublished?: boolean;
-  note?: string;
-  eventType?: string;
-  approvedLetterLink?: string;
+  note?: string | null;
+  eventType?: string | null;
+  approvedLetterLink?: string | null;
+  reason?: string | null;
 }
 
 export interface PublishedEventDatesResponse {
   id: string;
   eventName: string;
   eventDate: Date;
+}
+
+export interface AddFavoriteEventRequestBody {
+  eventId: string;
 }
 
 // Admin
