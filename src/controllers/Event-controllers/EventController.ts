@@ -9,6 +9,7 @@ import {
   getOwnerAllEventService,
   publishedEventService,
   getOwnerEventService,
+  getPublishedEventDatesService,
 } from "../../services/eventService";
 import { FilterOptions } from "../../types/Event-types/EventTypes";
 import { filterEventService } from "../../services/adminService";
@@ -38,6 +39,16 @@ const getAllPublishedEventController = asyncHandler(
     const allEvents = await getAllEventService(next);
 
     res.status(200).json({ success: true, statusCode: 200, data: allEvents });
+  }
+);
+
+const getAllPublishedEventDatesController = asyncHandler(
+  async (req: Request, res: Response<ResponseFormat>, next: NextFunction) => {
+    const allEventDates = await getPublishedEventDatesService(next);
+
+    res
+      .status(200)
+      .json({ success: true, statusCode: 200, data: allEventDates });
   }
 );
 
@@ -127,6 +138,7 @@ export {
   EventController,
   publishedEventController,
   getAllPublishedEventController,
+  getAllPublishedEventDatesController,
   getPublishedEventController,
   getOwnerAllEventsController,
   getOwnerEventController,

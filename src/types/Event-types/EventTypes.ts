@@ -55,6 +55,12 @@ export interface EventResponse {
   approvedLetterLink?: string;
 }
 
+export interface PublishedEventDatesResponse {
+  id: string;
+  eventName: string;
+  eventDate: Date;
+}
+
 // Admin
 export interface AddVenueRequestBody {
   venueName?: string;

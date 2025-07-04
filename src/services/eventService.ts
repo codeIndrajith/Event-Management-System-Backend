@@ -2,6 +2,7 @@ import { Request, NextFunction } from "express";
 import {
   EventRequestBody,
   EventResponse,
+  PublishedEventDatesResponse,
   PublishEventRequestBody,
 } from "../types/Event-types/EventTypes";
 import { PrismaClient } from "@prisma/client";
@@ -131,6 +132,33 @@ export const getPublishedEventService = async (
     }
 
     return event;
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const getPublishedEventDatesService = async (
+  next: NextFunction
+): Promise<PublishedEventDatesResponse[]> => {
+  try {
+    const eventDates = await prisma.event.findMany({
+      where: {
+        isPublished: true,
+        isApproved: true,
+      },
+      select: {
+        id: true,
+        eventName: true,
+        eventDate: true,
+      },
+    });
+
+    if (eventDates.length === 0) {
+      throw new ErrorResponse("Published Events not found", 404);
+    }
+
+    return eventDates;
   } catch (error: any) {
     next(error);
     throw error;
