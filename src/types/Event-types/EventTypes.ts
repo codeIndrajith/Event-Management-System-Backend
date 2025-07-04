@@ -66,6 +66,12 @@ export interface AddFavoriteEventRequestBody {
   eventId: string;
 }
 
+export interface UserFavouriteEventResponse {
+  id: string;
+  eventId: string;
+  userId: string;
+}
+
 // Admin
 export interface AddVenueRequestBody {
   venueName?: string;

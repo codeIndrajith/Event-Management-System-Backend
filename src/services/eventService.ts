@@ -5,6 +5,7 @@ import {
   EventResponse,
   PublishedEventDatesResponse,
   PublishEventRequestBody,
+  UserFavouriteEventResponse,
 } from "../types/Event-types/EventTypes";
 import { PrismaClient } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
@@ -290,6 +291,15 @@ export const addFavoriteEventService = async (
   userId: string
 ): Promise<string> => {
   try {
+    const existingFavourites = await prisma.favoriteEvents.findFirst({
+      where: {
+        eventId: data.eventId,
+        userId: userId,
+      },
+    });
+    if (existingFavourites) {
+      throw new ErrorResponse("Event is already in favorites", 400);
+    }
     const eventAddFavorite = await prisma.favoriteEvents.create({
       data: {
         eventId: data.eventId,
@@ -297,10 +307,60 @@ export const addFavoriteEventService = async (
       },
     });
     if (eventAddFavorite) {
-      return "Event Publish Complete";
+      return "Event Add To Favourite";
     } else {
       throw new ErrorResponse("Failed to add event to favorites", 400);
     }
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const removeAddedFavoriteEventService = async (
+  next: NextFunction,
+  userId: string,
+  eventId: string
+): Promise<string> => {
+  try {
+    const existingFavorite = await prisma.favoriteEvents.findFirst({
+      where: {
+        eventId: eventId,
+        userId: userId,
+      },
+    });
+
+    if (!existingFavorite) {
+      throw new ErrorResponse("Favorite event not found", 404);
+    }
+    const removeFavourite = await prisma.favoriteEvents.delete({
+      where: {
+        id: existingFavorite?.id,
+      },
+    });
+    if (removeFavourite) {
+      return "Event removed from Favourite";
+    } else {
+      throw new ErrorResponse("Failed to remove event from favorites", 400);
+    }
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const getUserddedFavoriteEventService = async (
+  next: NextFunction,
+  userId: string
+): Promise<UserFavouriteEventResponse[]> => {
+  try {
+    const events = await prisma.favoriteEvents.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+
+    return events;
   } catch (error: any) {
     next(error);
     throw error;

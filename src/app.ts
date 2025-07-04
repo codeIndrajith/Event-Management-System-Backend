@@ -31,7 +31,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/join", joinEventRoutes);
-app.use("/api/v1/favourite/new", favouriteEventRoutes);
+app.use("/api/v1/favourite", favouriteEventRoutes);
 
 // Handle errors
 app.use(errorHandler);

@@ -11,6 +11,8 @@ import {
   getOwnerEventService,
   getPublishedEventDatesService,
   addFavoriteEventService,
+  removeAddedFavoriteEventService,
+  getUserddedFavoriteEventService,
 } from "../../services/eventService";
 import { FilterOptions } from "../../types/Event-types/EventTypes";
 import { filterEventService } from "../../services/adminService";
@@ -98,6 +100,7 @@ const publishedEventController = asyncHandler(
   }
 );
 
+// Favorites events controllers
 const addFavoriteEventController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
     const userId: string = req.user?.id as string;
@@ -111,6 +114,33 @@ const addFavoriteEventController = asyncHandler(
     res
       .status(201)
       .json({ success: true, statusCode: 201, message: eventAddToFavoriteMsg });
+  }
+);
+
+const removeAddedFavoriteEventController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const userId: string = req.user?.id as string;
+    const eventId: string = req.params?.eventId;
+
+    const eventAddToFavoriteMsg = await removeAddedFavoriteEventService(
+      next,
+      userId,
+      eventId
+    );
+
+    res
+      .status(201)
+      .json({ success: true, statusCode: 201, message: eventAddToFavoriteMsg });
+  }
+);
+
+const getuserAddedFavoriteEventController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    const userId: string = req.user?.id as string;
+
+    const userEvent = await getUserddedFavoriteEventService(next, userId);
+
+    res.status(201).json({ success: true, statusCode: 200, data: userEvent });
   }
 );
 
@@ -160,5 +190,7 @@ export {
   getOwnerAllEventsController,
   getOwnerEventController,
   addFavoriteEventController,
+  removeAddedFavoriteEventController,
+  getuserAddedFavoriteEventController,
   FilterVenueController,
 };
