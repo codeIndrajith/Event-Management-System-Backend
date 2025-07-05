@@ -3,6 +3,7 @@ import {
   IRequest,
   SignInRequestBody,
   SignUpRequestBody,
+  UserProfileUpdateRequestBody,
 } from "../types/authTypes";
 import bcrypt from "bcryptjs";
 import { UserPublicData } from "../types/public-types/user.types";
@@ -95,6 +96,32 @@ export const getUsersService = async (
     return {
       ...publicData,
     };
+  } catch (error: any) {
+    next(error);
+    throw error;
+  }
+};
+
+export const userProfileUpdateService = async (
+  data: UserProfileUpdateRequestBody,
+  userId: string,
+  next: NextFunction
+): Promise<string> => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: data.name,
+        email: data.email,
+        profileImage: data.profileImage,
+      },
+    });
+
+    if (!updatedUser) {
+      throw new ErrorResponse("Profile update failed", 400);
+    }
+
+    return "Profile update successful";
   } catch (error: any) {
     next(error);
     throw error;

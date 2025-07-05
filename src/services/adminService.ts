@@ -163,6 +163,7 @@ export const pendingApproveEventService = async (
         eventLocation: true,
         eventName: true,
         senderName: true,
+        reason: true,
         senderRole: true,
         senderOrganization: true,
         letterLink: true,

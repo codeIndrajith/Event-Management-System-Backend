@@ -38,3 +38,9 @@ export interface CookieOptions {
 export interface IRequest extends Request {
   user?: UserPublicData;
 }
+
+export interface UserProfileUpdateRequestBody {
+  name?: string;
+  email?: string;
+  profileImage?: string;
+}
