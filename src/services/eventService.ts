@@ -291,6 +291,15 @@ export const addFavoriteEventService = async (
   userId: string
 ): Promise<string> => {
   try {
+    const isPublished = await prisma.event.findFirst({
+      where: {
+        isApproved: true,
+        isPublished: true,
+      },
+    });
+    if (!isPublished) {
+      throw new ErrorResponse("Event is not published", 400);
+    }
     const existingFavourites = await prisma.favoriteEvents.findFirst({
       where: {
         eventId: data.eventId,
@@ -358,9 +367,12 @@ export const getUserddedFavoriteEventService = async (
       where: {
         userId: userId,
       },
+      include: {
+        event: true,
+      },
     });
 
-    return events;
+    return sanitizeResponse(events);
   } catch (error: any) {
     next(error);
     throw error;

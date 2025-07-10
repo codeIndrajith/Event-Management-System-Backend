@@ -129,8 +129,8 @@ const removeAddedFavoriteEventController = asyncHandler(
     );
 
     res
-      .status(201)
-      .json({ success: true, statusCode: 201, message: eventAddToFavoriteMsg });
+      .status(200)
+      .json({ success: true, statusCode: 200, message: eventAddToFavoriteMsg });
   }
 );
 
@@ -140,7 +140,7 @@ const getuserAddedFavoriteEventController = asyncHandler(
 
     const userEvent = await getUserddedFavoriteEventService(next, userId);
 
-    res.status(201).json({ success: true, statusCode: 200, data: userEvent });
+    res.status(200).json({ success: true, statusCode: 200, data: userEvent });
   }
 );
 
