@@ -32,6 +32,7 @@ export const eventService = async (
         eventDate: input.eventDate,
         eventTime: input.eventTime,
         eventLocation: input.venue,
+        venueId: input.venuId,
         letterLink: input.letterLink,
       },
     });
@@ -45,6 +46,7 @@ export const eventService = async (
           isSelected: true,
         },
       });
+
       return {
         success: true,
         eventId: event?.id,

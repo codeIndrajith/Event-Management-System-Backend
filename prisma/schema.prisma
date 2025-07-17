@@ -7,98 +7,102 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  Admin
-  Organizer
-  Participant
-}
-
 model User {
-  id            String          @id @default(uuid())
-  name          String
-  email         String          @unique
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  password      String
-  role          Role
-  profileImage  String
-  event         Event[]
-  venues        Venue[]
-  joinMembers   JoinMembers[]
-  FavoriteEvents    FavoriteEvents[]
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  password       String
+  role           Role
+  profileImage   String
+  event          Event[]
+  FavoriteEvents FavoriteEvents[]
+  joinMembers    JoinMembers[]
+  venues         Venue[]
 }
 
 model Event {
-  id                 String   @id @default(uuid())
+  id                 String           @id @default(uuid())
   senderId           String
   senderName         String
   senderRole         String
   senderOrganization String
   eventDate          String
   eventTime          String
+  venueId            String?
+  joinCount           Int? @default(0)
   eventLocation      String
   letterLink         String
-  isApproved          Boolean @default(false)
-  isPublished         Boolean @default(false)
-  eventName            String?
-  eventDescription     String?
-  bannerImage           String?
-  note                  String?
-  reason                String?
-  eventType             String?
-  approvedLetterLink  String? 
-  approverName        String?
-  approverRole        String?
-  favUsers            String[]
-  sender              User     @relation(fields: [senderId], references: [id])
-  venueDates        VenueDates[]
-  joinMembers       JoinMembers[]
-  FavoriteEvents    FavoriteEvents[]
+  isApproved         Boolean          @default(false)
+  eventName          String?
+  eventDescription   String?
+  bannerImage        String?
+  note               String?
+  eventType          String?
+  approvedLetterLink String?
+  approverName       String?
+  approverRole       String?
+  isPublished        Boolean          @default(false)
+  reason             String?
+  favUsers           String[]
+  sender             User             @relation(fields: [senderId], references: [id])
+  FavoriteEvents     FavoriteEvents[]
+  joinMembers        JoinMembers[]
+  venueDates         VenueDates[]
 }
 
 model Venue {
-  id            String   @id @default(uuid())
-  adminId       String
-  venueName     String
-  locationType  LocationType
-  maxAttendees  Int
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  admin         User     @relation(fields: [adminId], references: [id])
-  venueDates    VenueDates[]
+  id           String       @id @default(uuid())
+  venueName    String
+  locationType LocationType
+  maxAttendees Int
+  freeSlots     Int?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  adminId      String
+  admin        User         @relation(fields: [adminId], references: [id])
+  venueDates   VenueDates[]
+}
+
+model VenueDates {
+  id         String  @id @default(uuid())
+  venuId     String
+  date       String
+  isSelected Boolean @default(false)
+  eventId    String
+  event      Event   @relation(fields: [eventId], references: [id])
+  venue      Venue   @relation(fields: [venuId], references: [id])
+}
+
+model JoinMembers {
+  id               String @id @default(uuid())
+  eventId          String
+  participantId    String
+  participantName  String
+  participantEmail String
+  contactNumber    String
+  event            Event  @relation(fields: [eventId], references: [id])
+  participant      User   @relation(fields: [participantId], references: [id])
+}
+
+model FavoriteEvents {
+  id      String @id @default(uuid())
+  eventId String
+  userId  String
+  event   Event  @relation(fields: [eventId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+enum Role {
+  Admin
+  Organizer
+  Participant
 }
 
 enum LocationType {
   indoor
   outdoor
-}
-
-model VenueDates {
-  id            String @id @default(uuid())
-  venuId        String
-  eventId       String
-  date          String
-  isSelected    Boolean @default(false)
-  venue         Venue @relation(fields: [venuId], references: [id])
-  event         Event @relation(fields: [eventId], references: [id])
-}
-
-model JoinMembers {
-  id                String @id @default(uuid())
-  eventId           String
-  participantId     String
-  participantName   String
-  participantEmail  String
-  contactNumber     String
-  event             Event @relation(fields: [eventId], references: [id])
-  participant       User @relation(fields: [participantId], references: [id])
-}
-
-model FavoriteEvents {
-  id                String @id @default(uuid())
-  eventId           String
-  userId            String
-  event             Event @relation(fields: [eventId], references: [id])
-  user              User @relation(fields: [userId], references: [id])
-  @@unique([userId, eventId])
 }

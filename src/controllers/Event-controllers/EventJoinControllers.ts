@@ -12,7 +12,7 @@ const eventJoinController = asyncHandler(
 
     res
       .status(200)
-      .json({ success: true, statusCode: 201, message: joinUserMsg });
+      .json({ success: true, statusCode: 200, message: joinUserMsg });
   }
 );
 
