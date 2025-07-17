@@ -49,6 +49,7 @@ model Event {
   approvedLetterLink  String? 
   approverName        String?
   approverRole        String?
+  favUsers            String[]
   sender              User     @relation(fields: [senderId], references: [id])
   venueDates        VenueDates[]
   joinMembers       JoinMembers[]
@@ -99,4 +100,5 @@ model FavoriteEvents {
   userId            String
   event             Event @relation(fields: [eventId], references: [id])
   user              User @relation(fields: [userId], references: [id])
+  @@unique([userId, eventId])
 }

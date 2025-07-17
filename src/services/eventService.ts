@@ -87,6 +87,7 @@ export const getAllEventService = async (
         eventType: true,
         isApproved: true,
         isPublished: true,
+        favUsers: true,
       },
     });
 
@@ -124,6 +125,7 @@ export const getPublishedEventService = async (
         isPublished: true,
         letterLink: true,
         approvedLetterLink: true,
+        favUsers: true,
       },
     });
 
@@ -193,6 +195,7 @@ export const getOwnerAllEventService = async (
         isPublished: true,
         letterLink: true,
         approvedLetterLink: true,
+        favUsers: true,
       },
     });
 
@@ -229,6 +232,7 @@ export const getOwnerEventService = async (
         isPublished: true,
         letterLink: true,
         approvedLetterLink: true,
+        favUsers: true,
       },
     });
 
@@ -315,6 +319,15 @@ export const addFavoriteEventService = async (
         userId: userId,
       },
     });
+
+    await prisma.event.update({
+      where: {
+        id: data.eventId,
+      },
+      data: {
+        favUsers: { push: userId },
+      },
+    });
     if (eventAddFavorite) {
       return "Event Add To Favourite";
     } else {
@@ -347,6 +360,23 @@ export const removeAddedFavoriteEventService = async (
         id: existingFavorite?.id,
       },
     });
+
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    const updatedFavUsers = event?.favUsers.filter(
+      (id: string) => id !== userId
+    );
+
+    await prisma.event.update({
+      where: {
+        id: eventId,
+      },
+      data: {
+        favUsers: updatedFavUsers,
+      },
+    });
     if (removeFavourite) {
       return "Event removed from Favourite";
     } else {
@@ -372,7 +402,16 @@ export const getUserddedFavoriteEventService = async (
       },
     });
 
-    return sanitizeResponse(events);
+    const cleanedEvents = events.map((fav: any) => ({
+      ...fav,
+      event: fav.event
+        ? Object.fromEntries(
+            Object.entries(fav.event).filter(([_, value]) => value !== null)
+          )
+        : null,
+    }));
+
+    return sanitizeResponse(cleanedEvents);
   } catch (error: any) {
     next(error);
     throw error;
