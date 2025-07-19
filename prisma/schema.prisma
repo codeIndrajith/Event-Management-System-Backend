@@ -31,7 +31,8 @@ model Event {
   eventDate          String
   eventTime          String
   venueId            String?
-  joinCount           Int? @default(0)
+  freeSlots           Int? @default(0)
+  joinMemberCount      Int? @default(0)
   eventLocation      String
   letterLink         String
   isApproved         Boolean          @default(false)
@@ -57,7 +58,6 @@ model Venue {
   venueName    String
   locationType LocationType
   maxAttendees Int
-  freeSlots     Int?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   adminId      String
@@ -84,6 +84,8 @@ model JoinMembers {
   contactNumber    String
   event            Event  @relation(fields: [eventId], references: [id])
   participant      User   @relation(fields: [participantId], references: [id])
+
+   @@unique([eventId, participantId])
 }
 
 model FavoriteEvents {

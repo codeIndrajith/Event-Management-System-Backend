@@ -17,54 +17,40 @@ export const eventJoinService = async (
       },
     });
 
-    const venue = await prisma.venue.findUnique({
-      where: {
-        id: event.venueId,
-      },
-    });
+    if (!event) {
+      throw new ErrorResponse("Event not found", 404);
+    }
 
-    if (venue?.freeSlots === 0) {
+    if (event?.joinMemberCount === event?.freeSlots) {
       throw new ErrorResponse(
         "This event is fully booked. You cannot join at the moment",
         404
       );
     }
 
-    const joinMemberMsg = await prisma.joinMembers.create({
-      data: {
-        eventId: data?.eventId,
-        participantId: user?.id,
-        participantName: user?.name,
-        participantEmail: user?.email,
-        contactNumber: data?.contactNumber,
-      },
-    });
+    if (event?.isPublished === false || event?.isApproved === false) {
+      throw new ErrorResponse("Event not Approved or Published", 400);
+    }
 
-    console.log(data.eventId);
-
-    await prisma.event.update({
-      where: {
-        id: data?.eventId,
-      },
-      data: {
-        joinCount: {
-          increment: 1,
+    const [joinedMember] = await prisma.$transaction([
+      prisma.joinMembers.create({
+        data: {
+          eventId: data.eventId,
+          participantId: user.id,
+          participantName: user.name,
+          participantEmail: user.email,
+          contactNumber: data.contactNumber,
         },
-      },
-    });
-
-    await prisma.venue.update({
-      where: {
-        id: event.venueId,
-      },
-      data: {
-        freeSlots: {
-          decrement: 1,
+      }),
+      prisma.event.update({
+        where: { id: data.eventId },
+        data: {
+          joinMemberCount: { increment: 1 },
         },
-      },
-    });
+      }),
+    ]);
 
-    if (joinMemberMsg) {
+    if (joinedMember) {
       return "Event Joined Complete";
     } else {
       return "Event Joined Failed";

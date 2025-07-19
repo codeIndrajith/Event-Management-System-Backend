@@ -20,6 +20,16 @@ export const eventService = async (
   next: NextFunction
 ): Promise<any> => {
   try {
+    const { maxAttendees } = await prisma.venue.findUnique({
+      where: {
+        id: input.venuId,
+      },
+    });
+
+    if (maxAttendees === 0) {
+      throw new ErrorResponse("This venue not good for any events", 400);
+    }
+
     const docId: any = uuidv4();
     const event = await prisma.event.create({
       data: {
@@ -32,6 +42,7 @@ export const eventService = async (
         eventDate: input.eventDate,
         eventTime: input.eventTime,
         eventLocation: input.venue,
+        freeSlots: maxAttendees,
         venueId: input.venuId,
         letterLink: input.letterLink,
       },
@@ -90,6 +101,8 @@ export const getAllEventService = async (
         isApproved: true,
         isPublished: true,
         favUsers: true,
+        joinMemberCount: true,
+        freeSlots: true,
       },
     });
 
@@ -128,6 +141,8 @@ export const getPublishedEventService = async (
         letterLink: true,
         approvedLetterLink: true,
         favUsers: true,
+        joinMemberCount: true,
+        freeSlots: true,
       },
     });
 
@@ -198,6 +213,8 @@ export const getOwnerAllEventService = async (
         letterLink: true,
         approvedLetterLink: true,
         favUsers: true,
+        joinMemberCount: true,
+        freeSlots: true,
       },
     });
 
@@ -235,6 +252,8 @@ export const getOwnerEventService = async (
         letterLink: true,
         approvedLetterLink: true,
         favUsers: true,
+        joinMemberCount: true,
+        freeSlots: true,
       },
     });
 
