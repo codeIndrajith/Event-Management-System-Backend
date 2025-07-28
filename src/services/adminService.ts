@@ -28,7 +28,7 @@ export const addVenuService = async (
         venueName: input.venueName,
         locationType: input.locationType,
         maxAttendees: input.maxAttendees,
-        freeSlots: input.maxAttendees,
+        // freeSlots: input.maxAttendees,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
