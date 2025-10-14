@@ -69,6 +69,8 @@ model VenueDates {
   id         String  @id @default(uuid())
   venuId     String
   date       String
+  startTime   String
+  endTime     String
   isSelected Boolean @default(false)
   eventId    String
   event      Event   @relation(fields: [eventId], references: [id])

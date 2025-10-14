@@ -1,6 +1,8 @@
 import { Request, NextFunction } from "express";
 import {
   AddFavoriteEventRequestBody,
+  EventHistoryFilters,
+  EventHistoryResponse,
   EventRequestBody,
   EventResponse,
   PublishedEventDatesResponse,
@@ -40,7 +42,7 @@ export const eventService = async (
         senderOrganization: input.senderOrganization,
         eventName: input.eventName,
         eventDate: input.eventDate,
-        eventTime: input.eventTime,
+        eventTime: input.startTime + "-" + input.endTime,
         eventLocation: input.venue,
         freeSlots: maxAttendees,
         venueId: input.venuId,
@@ -54,6 +56,8 @@ export const eventService = async (
           date: input?.eventDate,
           venuId: input?.venuId,
           eventId: event?.id,
+          startTime: input?.startTime,
+          endTime: input?.endTime,
           isSelected: true,
         },
       });
@@ -436,5 +440,85 @@ export const getUserddedFavoriteEventService = async (
   } catch (error: any) {
     next(error);
     throw error;
+  }
+};
+
+export const getEventHistoryService = async (
+  filters: EventHistoryFilters
+): Promise<EventHistoryResponse[]> => {
+  try {
+    const currentDate = new Date();
+    const targetMonth = filters.month || currentDate.getMonth() + 1;
+    const targetYear = filters.year || currentDate.getFullYear();
+
+    const startDate = new Date(targetYear, targetMonth - 1, 1);
+    const endDate = new Date(targetYear, targetMonth, 0);
+
+    const venueDates = await prisma.venueDates.findMany({
+      where: {
+        isSelected: true,
+        date: {
+          gte: startDate.toISOString().split("T")[0],
+          lte: endDate.toISOString().split("T")[0],
+        },
+        ...(filters.venueId && { venuId: filters.venueId }),
+        event: {
+          ...(filters.eventType && { eventType: filters.eventType }),
+        },
+      },
+      include: {
+        event: true,
+        venue: {
+          select: {
+            id: true,
+            venueName: true,
+            locationType: true,
+            maxAttendees: true,
+          },
+        },
+      },
+      orderBy: [{ date: "asc" }, { startTime: "asc" }],
+    });
+
+    // Transform the data to match our response format
+    const events: EventHistoryResponse[] = venueDates.map((venueDate: any) => {
+      const event = venueDate.event;
+
+      return {
+        id: event.id,
+        eventName: event.eventName,
+        eventType: event.eventType,
+        description: event.description || undefined,
+        date: venueDate.date,
+        startTime: venueDate.startTime,
+        endTime: venueDate.endTime,
+        venue: {
+          id: venueDate.venue.id,
+          venueName: venueDate.venue.venueName,
+          locationType: venueDate.venue.locationType,
+        },
+        attendeesCount: event.attendees?.length || 0,
+        status: getEventStatus(venueDate.date, venueDate.endTime),
+      };
+    });
+
+    return events;
+  } catch (error: any) {
+    console.error("Event history service error:", error);
+    throw new Error(`Failed to fetch event history: ${error.message}`);
+  }
+};
+
+// Helper function to determine event status
+const getEventStatus = (date: string, endTime: string): string => {
+  const eventDateTime = new Date(`${date}T${endTime}`);
+  const now = new Date();
+
+  if (eventDateTime < now) {
+    return "completed";
+  } else if (eventDateTime.toDateString() === now.toDateString()) {
+    return "ongoing";
+  } else {
+    return "upcoming";
   }
 };

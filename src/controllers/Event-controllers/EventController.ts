@@ -13,10 +13,14 @@ import {
   addFavoriteEventService,
   removeAddedFavoriteEventService,
   getUserddedFavoriteEventService,
+  getEventHistoryService,
 } from "../../services/eventService";
-import { FilterOptions } from "../../types/Event-types/EventTypes";
 import { filterEventService } from "../../services/adminService";
 import { ErrorResponse } from "../../utils/errorResponse";
+import {
+  EventHistoryFilters,
+  FilterOptions,
+} from "../../types/Event-types/EventTypes";
 
 const EventController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
@@ -144,6 +148,7 @@ const getuserAddedFavoriteEventController = asyncHandler(
   }
 );
 
+// controller
 const FilterVenueController = asyncHandler(
   async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
     if (req.query.date === undefined) {
@@ -158,7 +163,31 @@ const FilterVenueController = asyncHandler(
     if (!dateRegex.test(rawDate)) {
       throw new ErrorResponse("Invalid date format: expected yyyy-mm-dd", 400);
     }
-    const { venueName, locationType, maxAttendees } = req.query;
+
+    const { venueName, locationType, maxAttendees, startTime, endTime } =
+      req.query;
+
+    // Validate time formats if provided
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
+
+    if (
+      startTime &&
+      typeof startTime === "string" &&
+      !timeRegex.test(startTime)
+    ) {
+      throw new ErrorResponse(
+        "Invalid startTime format: expected HH:MM or HH:MM:SS",
+        400
+      );
+    }
+
+    if (endTime && typeof endTime === "string" && !timeRegex.test(endTime)) {
+      throw new ErrorResponse(
+        "Invalid endTime format: expected HH:MM or HH:MM:SS",
+        400
+      );
+    }
+
     const filters: FilterOptions = {
       venueName: typeof venueName === "string" ? venueName : undefined,
       locationType:
@@ -170,7 +199,10 @@ const FilterVenueController = asyncHandler(
           ? parseInt(maxAttendees, 10)
           : undefined,
       date: rawDate,
+      startTime: typeof startTime === "string" ? startTime : undefined,
+      endTime: typeof endTime === "string" ? endTime : undefined,
     };
+
     const venues = await filterEventService(filters, next);
 
     res.status(200).json({
@@ -178,6 +210,43 @@ const FilterVenueController = asyncHandler(
       statusCode: 200,
       data: venues,
     });
+  }
+);
+
+export const getEventHistoryController = asyncHandler(
+  async (req: IRequest, res: Response<ResponseFormat>, next: NextFunction) => {
+    try {
+      const { month, year, venueId, eventType } = req.query;
+
+      // Parse and validate filters
+      const filters: EventHistoryFilters = {
+        month: month ? parseInt(month as string) : undefined,
+        year: year ? parseInt(year as string) : undefined,
+        venueId: typeof venueId === "string" ? venueId : undefined,
+        eventType: typeof eventType === "string" ? eventType : undefined,
+      };
+
+      // Validate month range if provided
+      if (filters.month && (filters.month < 1 || filters.month > 12)) {
+        throw new ErrorResponse("Month must be between 1 and 12", 400);
+      }
+
+      // Validate year if provided
+      if (filters.year && filters.year < 2000) {
+        throw new ErrorResponse("Year must be 2000 or later", 400);
+      }
+
+      const events = await getEventHistoryService(filters);
+
+      res.status(200).json({
+        success: true,
+        statusCode: 200,
+        data: events,
+        message: `Found ${events.length} events`,
+      });
+    } catch (error: any) {
+      next(error);
+    }
   }
 );
 

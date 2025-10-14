@@ -179,24 +179,75 @@ export const pendingApproveEventService = async (
   }
 };
 
+// service
 export const filterEventService = async (
   filters: FilterOptions,
   next: NextFunction
 ): Promise<FilteredVenueResponse[]> => {
   try {
+    let finalStartTime = filters.startTime;
+    let finalEndTime = filters.endTime;
+
+    if (finalStartTime && !finalEndTime) {
+      const [hours, minutes] = finalStartTime.split(":").map(Number);
+      let endHours = hours + 2;
+      let endMinutes = minutes;
+
+      // Handle hour rollover
+      if (endHours >= 24) {
+        endHours = endHours - 24;
+      }
+
+      finalEndTime = `${endHours.toString().padStart(2, "0")}:${endMinutes
+        .toString()
+        .padStart(2, "0")}`;
+      if (finalStartTime.includes(":")) {
+        finalEndTime += ":00";
+      }
+    }
+
     const venues = await prisma.venue.findMany({
       where: {
         ...(filters.venueName && {
           venueName: { contains: filters.venueName, mode: "insensitive" },
         }),
         ...(filters.locationType && { locationType: filters.locationType }),
-        ...(filters.maxAttendees && { maxAttendees: filters.maxAttendees }),
+        ...(filters.maxAttendees && {
+          maxAttendees: { gte: filters.maxAttendees },
+        }),
 
-        // Check venu is available or not
+        // Check venue availability - no overlapping bookings
         venueDates: {
           none: {
-            date: filters.date,
             isSelected: true,
+            AND: [
+              { date: filters.date },
+              {
+                OR: [
+                  // Case 1: Requested start time falls within an existing booking
+                  {
+                    AND: [
+                      { startTime: { lte: finalStartTime } },
+                      { endTime: { gt: finalStartTime } },
+                    ],
+                  },
+                  // Case 2: Requested end time falls within an existing booking
+                  {
+                    AND: [
+                      { startTime: { lt: finalEndTime } },
+                      { endTime: { gte: finalEndTime } },
+                    ],
+                  },
+                  // Case 3: Requested time completely contains an existing booking
+                  {
+                    AND: [
+                      { startTime: { gte: finalStartTime } },
+                      { endTime: { lte: finalEndTime } },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
         },
       },
@@ -209,11 +260,12 @@ export const filterEventService = async (
     });
 
     if (venues.length === 0) {
-      throw new ErrorResponse("No venues available on this date", 400);
+      throw new ErrorResponse("No venues available on this date and time", 400);
     }
 
     return venues;
   } catch (error: any) {
+    console.error("Filter service error:", error);
     next(error);
     throw error;
   }

@@ -8,6 +8,7 @@ import {
   publishedEventController,
   getOwnerEventController,
   getAllPublishedEventDatesController,
+  getEventHistoryController,
 } from "../../controllers/Event-controllers/EventController";
 import { authorize, protect } from "../../middlewares/authMiddlware";
 const router = express.Router();
@@ -28,6 +29,7 @@ router.route("/").get(getAllPublishedEventController);
 router
   .route("/filter-venue")
   .get(protect, authorize("Organizer"), FilterVenueController);
+router.route("/history").get(getEventHistoryController);
 router.route("/event-dates").get(getAllPublishedEventDatesController);
 router.route("/:eventId").get(getPublishedEventController);
 

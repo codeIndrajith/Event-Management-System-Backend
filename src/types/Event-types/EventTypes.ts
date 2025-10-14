@@ -4,7 +4,8 @@ export interface EventRequestBody {
   senderOrganization: string;
   eventName: string;
   eventDate: Date;
-  eventTime: string;
+  startTime: string;
+  endTime: string;
   venuId: string;
   venue: string;
   letterLink: string;
@@ -84,6 +85,9 @@ export interface FilterOptions {
   locationType?: "indoor" | "outdoor";
   maxAttendees?: number;
   date: string;
+  startTime?: string;
+  endTime?: string;
+  duration?: number;
 }
 
 export interface VenueResponse {
@@ -104,4 +108,28 @@ export interface AdminDashboardDataServiceResponse {
   pendingEvents?: number;
   activeVenues: number;
   recentEvents?: Event;
+}
+
+export interface EventHistoryFilters {
+  month?: number;
+  year?: number;
+  venueId?: string;
+  eventType?: string;
+}
+
+export interface EventHistoryResponse {
+  id: string;
+  eventName: string;
+  eventType: string;
+  description?: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venue: {
+    id: string;
+    venueName: string;
+    locationType: string;
+  };
+  attendeesCount: number;
+  status: string;
 }
