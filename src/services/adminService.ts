@@ -11,6 +11,7 @@ import {
   VenueResponse,
 } from "../types/Event-types/EventTypes";
 import { ErrorResponse } from "../utils/errorResponse";
+import { sendPushNotification } from "../utils/firebase";
 
 const prisma: any = new PrismaClient();
 
@@ -131,6 +132,30 @@ export const approveEventService = async (
           isSelected: false,
         },
       });
+    }
+
+    const organizer = await prisma.user.findUnique({
+      where: {
+        id: eventApproved?.sendrId,
+      },
+    });
+
+    // send a push notification to the organizer (if they have an FCM token)
+    if (organizer && organizer?.notificationToken) {
+      try {
+        const title = data?.isApproved ? "Event Approved" : "Event Rejected";
+        const body = data?.isApproved
+          ? `Your event "${eventApproved.eventName}" has been approved.`
+          : `Your event "${eventApproved.eventName}" was not approved.${
+              data?.reason ? ` Reason: ${data.reason}` : ""
+            }`;
+
+        await sendPushNotification(organizer.fcmToken, title, body);
+        console.log("Notification sent to organizer:", organizer.id);
+      } catch (notifyError: any) {
+        console.error("Failed to send notification:", notifyError);
+        // don't fail the whole flow if notification fails
+      }
     }
 
     if (eventApproved) {

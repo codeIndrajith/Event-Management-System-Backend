@@ -13,6 +13,7 @@ export interface SignInRequestBody {
   email: string;
   password: string;
   role: string;
+  notificationToken?: string;
 }
 
 export interface AuthResponse {

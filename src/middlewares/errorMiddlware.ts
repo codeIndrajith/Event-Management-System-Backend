@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { ErrorResponse } from "../utils/errorResponse";
-import { Prisma } from "@prisma/client";
 import { ResponseFormat } from "../types/public-types/resFormat.type";
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+} from "@prisma/client/runtime/library";
 
 interface ErrorWithCode extends Error {
   code?: number;
@@ -20,7 +23,7 @@ export const errorHandler = (
   console.log(error);
 
   // Handle prisma errors
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+  if (err instanceof PrismaClientKnownRequestError) {
     switch (err.code) {
       case "P1001":
         error = new ErrorResponse(
@@ -57,7 +60,7 @@ export const errorHandler = (
           error = new ErrorResponse("Database operation failed", 500);
         }
     }
-  } else if (err instanceof Prisma.PrismaClientValidationError) {
+  } else if (err instanceof PrismaClientValidationError) {
     // Handle validation errors (like type mismatches)
     error = new ErrorResponse("Invalid data format provided", 400);
   }

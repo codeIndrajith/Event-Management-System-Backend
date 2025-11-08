@@ -13,6 +13,7 @@ import { PrismaClient } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { ErrorResponse } from "../utils/errorResponse";
 import { sanitizeResponse } from "../utils/sanitizedResponse";
+import { sendPushNotification } from "../utils/firebase";
 
 const prisma: any = new PrismaClient();
 
@@ -302,6 +303,27 @@ export const publishedEventService = async (
         isPublished: true,
       },
     });
+
+    const users = await prisma.user.findMany({
+      where: {
+        role: { in: ["Participant", "Organizer"] },
+        notificationToken: { not: null },
+      },
+    });
+
+    // send push notifications to all users about the new published event
+    for (const user of users) {
+      try {
+        const title = "New Event Published";
+        const body = `A new event "${publishEvent.eventName}" has been published. Check it out!`;
+        await sendPushNotification(user.notificationToken, title, body);
+      } catch (notifyError: any) {
+        console.error(
+          `Failed to send notification to user ${user.id}:`,
+          notifyError
+        );
+      }
+    } // Closing bracket for the for loop
 
     if (publishEvent) {
       return "Event Publish Complete";

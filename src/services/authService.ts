@@ -56,7 +56,7 @@ export const signinUser = async (
   input: SignInRequestBody,
   next: NextFunction
 ): Promise<UserPublicData> => {
-  const { email, password, role } = input;
+  const { email, password, role, notificationToken } = input;
 
   try {
     if (!role) {
@@ -71,6 +71,13 @@ export const signinUser = async (
     const isPasswordValid = await bcrypt.compare(password, logUser.password);
     if (!isPasswordValid) {
       throw new ErrorResponse("Invalid email or password", 401);
+    }
+    // update notification token if provided
+    if (notificationToken) {
+      await prisma.user.update({
+        where: { id: logUser.id },
+        data: { notificationToken },
+      });
     }
     const { password: _, ...publicData } = logUser;
     return {
